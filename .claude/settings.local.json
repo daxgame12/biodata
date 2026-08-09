@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"D:/Bio_data\" && find . -maxdepth 4 2>&1 | head -100)",
+      "Bash(npm -v)",
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-git)"
+    ]
+  }
+}
