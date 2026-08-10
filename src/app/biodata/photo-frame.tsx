@@ -7,6 +7,7 @@ type PhotoFrameProps = {
   src?: string;
   priority?: boolean;
   sizes?: string;
+  elevated?: boolean;
 };
 
 const aspectClass: Record<NonNullable<PhotoFrameProps["aspect"]>, string> = {
@@ -27,10 +28,13 @@ export function PhotoFrame({
   src,
   priority = false,
   sizes = "(min-width: 768px) 480px, 90vw",
+  elevated = false,
 }: PhotoFrameProps) {
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-[28px] bg-bio-surface ${aspectClass[aspect]}`}
+      className={`relative w-full overflow-hidden rounded-[28px] bg-bio-surface ${aspectClass[aspect]} ${
+        elevated ? "shadow-[0_24px_70px_-24px_rgba(27,26,24,0.35)]" : ""
+      }`}
     >
       {src ? (
         <Image
