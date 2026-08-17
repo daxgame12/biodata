@@ -9,10 +9,11 @@ type RevealProps = {
   /**
    * "image" — curtain-style wipe, used for gallery photos.
    * "hero-text" / "hero-photo" — a slower blur-to-sharp "focus pull"
-   * reserved for the hero's name/tagline and first photo. See the
-   * .reveal--* rules in globals.css for each curve.
+   * reserved for the hero's name/tagline and first photo.
+   * "glow" — the ambient light bloom behind the hero.
+   * See the .reveal--* rules in globals.css for each curve.
    */
-  variant?: "default" | "image" | "hero-text" | "hero-photo";
+  variant?: "default" | "image" | "hero-text" | "hero-photo" | "glow";
 };
 
 const variantClassName: Record<NonNullable<RevealProps["variant"]>, string> = {
@@ -20,12 +21,22 @@ const variantClassName: Record<NonNullable<RevealProps["variant"]>, string> = {
   image: "reveal--image",
   "hero-text": "reveal--hero-text",
   "hero-photo": "reveal--hero-photo",
+  glow: "reveal--glow",
 };
 
 /**
  * Fades and lifts children into place the first time they enter the
- * viewport. One-shot (unobserves after triggering) and fully inert under
- * prefers-reduced-motion via the .reveal rules in globals.css.
+ * viewport. One-shot and fully inert under prefers-reduced-motion via
+ * the .reveal rules in globals.css.
+ *
+ * Visibility is decided by a plain scroll/resize position check rather
+ * than IntersectionObserver — IntersectionObserver can behave
+ * inconsistently across browsers/viewports (notably for elements
+ * already in view when observation starts), which left photos stuck
+ * invisible on some devices. Throttling is done with a plain
+ * timestamp rather than requestAnimationFrame, since rAF itself gets
+ * paused for backgrounded/inactive tabs on some platforms — this
+ * check has no dependency on the page actually being painted.
  */
 export function Reveal({ children, className = "", delayMs = 0, variant = "default" }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -33,43 +44,34 @@ export function Reveal({ children, className = "", delayMs = 0, variant = "defau
 
   useEffect(() => {
     const node = ref.current;
-    if (!node) return;
+    if (!node || visible) return;
 
-    let done = false;
-    const reveal = () => {
-      if (done) return;
-      done = true;
-      setVisible(true);
-      observer.disconnect();
+    let lastCheck = 0;
+
+    const check = () => {
+      const now = Date.now();
+      if (now - lastCheck < 100) return;
+      lastCheck = now;
+
+      const rect = node.getBoundingClientRect();
+      // No lower bound on rect.bottom: an element that's already been
+      // scrolled past (e.g. a large jump-scroll) should still resolve
+      // to visible rather than staying stuck waiting for a scroll
+      // event that passes back through its exact former position.
+      if (rect.top < window.innerHeight * 0.92) {
+        setVisible(true);
+      }
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) reveal();
-        }
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
-    );
-
-    observer.observe(node);
-
-    // Safety net: some browsers don't reliably fire the observer for
-    // elements already intersecting when observation starts — notably
-    // above-the-fold content (like the hero) on a tall/wide viewport
-    // where nothing needs scrolling into view. Re-check shortly after
-    // mount so nothing gets stuck invisible.
-    const fallback = window.setTimeout(() => {
-      if (done) return;
-      const rect = node.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) reveal();
-    }, 200);
+    check(); // catch anything already in view immediately
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
 
     return () => {
-      observer.disconnect();
-      window.clearTimeout(fallback);
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
     };
-  }, []);
+  }, [visible]);
 
   return (
     <div
