@@ -39,7 +39,11 @@ const familyDetails = [
   { label: "Siblings", value: "1 Sister (Married)", Icon: PeopleIcon },
 ];
 
-const galleryPhotos = [{ id: 1 }, { id: 2 }, { id: 3 }];
+const galleryPhotos = [
+  { id: 1, src: "/biodata/gallery-1.jpg" },
+  { id: 2, src: "/biodata/gallery-2.jpg" },
+  { id: 3, src: "/biodata/gallery-3.jpg" },
+];
 
 export default function BiodataPage() {
   return (
@@ -131,7 +135,13 @@ function Hero() {
           </p>
         </Reveal>
         <Reveal delayMs={200} className="mt-16 w-full max-w-[280px] sm:max-w-[320px]">
-          <PhotoFrame alt="Dax Rajani" aspect="portrait" label="Add photo" priority elevated />
+          <PhotoFrame
+            alt="Dax Rajani"
+            aspect="portrait"
+            src="/biodata/hero.jpg"
+            priority
+            elevated
+          />
         </Reveal>
       </Container>
       <Reveal
@@ -312,7 +322,7 @@ function Gallery() {
         <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
           {galleryPhotos.map((photo, i) => (
             <Reveal key={photo.id} delayMs={i * 90}>
-              <PhotoFrame alt="Gallery photo" aspect="square" label="Add photo" />
+              <PhotoFrame alt="Gallery photo" aspect="square" src={photo.src} />
             </Reveal>
           ))}
         </div>

@@ -40,6 +40,10 @@ yarn-error.log*
 # claude code session state
 .claude/scheduled_tasks.lock
 
+# raw photo drops (originals are large/HEIC; only the processed
+# public/biodata/*.jpg crops belong in the repo)
+*.zip
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
