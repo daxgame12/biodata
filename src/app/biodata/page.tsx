@@ -134,7 +134,11 @@ function Hero() {
             Steady, curious, and building a life worth sharing.
           </p>
         </Reveal>
-        <Reveal delayMs={200} className="mt-16 w-full max-w-[280px] sm:max-w-[320px]">
+        <Reveal
+          delayMs={250}
+          variant="image"
+          className="mt-16 w-full max-w-[280px] sm:max-w-[320px]"
+        >
           <PhotoFrame
             alt="Dax Rajani"
             aspect="portrait"
@@ -321,7 +325,7 @@ function Gallery() {
         </Reveal>
         <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
           {galleryPhotos.map((photo, i) => (
-            <Reveal key={photo.id} delayMs={i * 90}>
+            <Reveal key={photo.id} delayMs={i * 160} variant="image">
               <PhotoFrame alt="Gallery photo" aspect="portrait" src={photo.src} />
             </Reveal>
           ))}

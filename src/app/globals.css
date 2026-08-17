@@ -73,18 +73,39 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Scroll-triggered reveal: translateY(20px) + opacity, ~400ms ease-out. */
+/*
+ * Scroll-triggered reveal. Uses an "ease-out-expo" curve
+ * (cubic-bezier(0.16, 1, 0.3, 1)) — fast to start, long gentle settle —
+ * the same family of curve used across Apple/Linear/Stripe-tier product
+ * pages for a considered, unhurried feel rather than a snap.
+ *
+ * Text content: a short, subtle rise (opacity + translateY).
+ * Photos (.reveal--image): a slow fade + gentle scale-down-to-rest
+ * instead of a slide — the standard treatment for image reveals, since
+ * a moving photograph reads as more deliberate than a sliding one.
+ */
 .reveal {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(16px);
   transition:
-    opacity 0.4s ease-out,
-    transform 0.4s ease-out;
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.reveal.reveal--image {
+  transform: scale(0.96);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.reveal--image.reveal-visible {
+  transform: scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {

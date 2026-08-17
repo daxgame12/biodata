@@ -6,6 +6,9 @@ type RevealProps = {
   children: ReactNode;
   className?: string;
   delayMs?: number;
+  /** "image" swaps the translateY rise for a slower fade + scale-to-rest,
+   *  the treatment photos read best with. See globals.css for the curve. */
+  variant?: "default" | "image";
 };
 
 /**
@@ -13,7 +16,7 @@ type RevealProps = {
  * viewport. One-shot (unobserves after triggering) and fully inert under
  * prefers-reduced-motion via the .reveal rules in globals.css.
  */
-export function Reveal({ children, className = "", delayMs = 0 }: RevealProps) {
+export function Reveal({ children, className = "", delayMs = 0, variant = "default" }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -40,7 +43,7 @@ export function Reveal({ children, className = "", delayMs = 0 }: RevealProps) {
   return (
     <div
       ref={ref}
-      className={`reveal ${visible ? "reveal-visible" : ""} ${className}`}
+      className={`reveal ${variant === "image" ? "reveal--image" : ""} ${visible ? "reveal-visible" : ""} ${className}`}
       style={{ transitionDelay: visible ? `${delayMs}ms` : "0ms" }}
     >
       {children}
