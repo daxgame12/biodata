@@ -322,7 +322,7 @@ function Gallery() {
         <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
           {galleryPhotos.map((photo, i) => (
             <Reveal key={photo.id} delayMs={i * 90}>
-              <PhotoFrame alt="Gallery photo" aspect="square" src={photo.src} />
+              <PhotoFrame alt="Gallery photo" aspect="portrait" src={photo.src} />
             </Reveal>
           ))}
         </div>
