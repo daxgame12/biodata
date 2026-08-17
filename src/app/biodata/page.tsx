@@ -124,19 +124,19 @@ function Hero() {
   return (
     <Section className="relative flex min-h-[92svh] flex-col items-center justify-center pt-24 pb-16 sm:pt-16">
       <Container className="flex flex-col items-center text-center">
-        <Reveal>
+        <Reveal variant="hero-text">
           <h1 className="text-hero font-semibold tracking-tight text-balance">
             Dax Rajani
           </h1>
         </Reveal>
-        <Reveal delayMs={100}>
+        <Reveal delayMs={180} variant="hero-text">
           <p className="mt-6 text-lg text-bio-ink-muted text-balance">
             Steady, curious, and building a life worth sharing.
           </p>
         </Reveal>
         <Reveal
-          delayMs={250}
-          variant="image"
+          delayMs={420}
+          variant="hero-photo"
           className="mt-16 w-full max-w-[280px] sm:max-w-[320px]"
         >
           <PhotoFrame
@@ -149,7 +149,7 @@ function Hero() {
         </Reveal>
       </Container>
       <Reveal
-        delayMs={400}
+        delayMs={900}
         className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center"
       >
         <div className="flex flex-col items-center gap-2 text-bio-ink-muted/70">

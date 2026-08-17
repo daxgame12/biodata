@@ -6,9 +6,20 @@ type RevealProps = {
   children: ReactNode;
   className?: string;
   delayMs?: number;
-  /** "image" swaps the translateY rise for a slower fade + scale-to-rest,
-   *  the treatment photos read best with. See globals.css for the curve. */
-  variant?: "default" | "image";
+  /**
+   * "image" — curtain-style wipe, used for gallery photos.
+   * "hero-text" / "hero-photo" — a slower blur-to-sharp "focus pull"
+   * reserved for the hero's name/tagline and first photo. See the
+   * .reveal--* rules in globals.css for each curve.
+   */
+  variant?: "default" | "image" | "hero-text" | "hero-photo";
+};
+
+const variantClassName: Record<NonNullable<RevealProps["variant"]>, string> = {
+  default: "",
+  image: "reveal--image",
+  "hero-text": "reveal--hero-text",
+  "hero-photo": "reveal--hero-photo",
 };
 
 /**
@@ -24,26 +35,46 @@ export function Reveal({ children, className = "", delayMs = 0, variant = "defau
     const node = ref.current;
     if (!node) return;
 
+    let done = false;
+    const reveal = () => {
+      if (done) return;
+      done = true;
+      setVisible(true);
+      observer.disconnect();
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setVisible(true);
-            observer.disconnect();
-          }
+          if (entry.isIntersecting) reveal();
         }
       },
       { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    // Safety net: some browsers don't reliably fire the observer for
+    // elements already intersecting when observation starts — notably
+    // above-the-fold content (like the hero) on a tall/wide viewport
+    // where nothing needs scrolling into view. Re-check shortly after
+    // mount so nothing gets stuck invisible.
+    const fallback = window.setTimeout(() => {
+      if (done) return;
+      const rect = node.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) reveal();
+    }, 200);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, []);
 
   return (
     <div
       ref={ref}
-      className={`reveal ${variant === "image" ? "reveal--image" : ""} ${visible ? "reveal-visible" : ""} ${className}`}
+      className={`reveal ${variantClassName[variant]} ${visible ? "reveal-visible" : ""} ${className}`}
       style={{ transitionDelay: visible ? `${delayMs}ms` : "0ms" }}
     >
       {children}
